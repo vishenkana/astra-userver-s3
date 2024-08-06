@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+docker:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - VERSION="$(<./VERSION)"
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+    - docker build . --no-cache --build-arg "REGISTRY=gl-registry/dev" --tag $CI_REGISTRY/$CI_PROJECT_PATH:$VERSION
+    - docker push $CI_REGISTRY/$CI_PROJECT_PATH:$VERSION
+  only:
+    - master
